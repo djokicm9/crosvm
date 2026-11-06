@@ -18,6 +18,7 @@ pub mod halla;
 pub mod haxm;
 #[cfg(any(target_os = "android", target_os = "linux"))]
 pub mod kvm;
+pub mod xen;
 #[cfg(target_arch = "riscv64")]
 pub mod riscv64;
 #[cfg(all(windows, feature = "whpx"))]
@@ -125,6 +126,7 @@ pub enum HypervisorKind {
     Kvm,
     Haxm,
     Whpx,
+    Xen,
 }
 
 /// A trait for checking hypervisor capabilities.
