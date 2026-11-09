@@ -1283,7 +1283,7 @@ fn setup_vm_components(cfg: &Config) -> Result<VmComponents> {
         None
     };
 
-    let vm_image = match cfg.executable_path {
+    let vm_image: VmImage = match cfg.executable_path {
         Some(Executable::Kernel(ref kernel_path)) => VmImage::Kernel(
             open_file_or_duplicate(kernel_path, OpenOptions::new().read(true)).with_context(
                 || format!("failed to open kernel image {}", kernel_path.display()),
@@ -1945,18 +1945,39 @@ fn run_kvm(device_path: Option<&Path>, cfg: Config, components: VmComponents) ->
 }
 
 fn run_xen(device_path: Option<&Path>, cfg: Config, components: VmComponents) -> Result<ExitState> {
+    use devices::XenIrqChip;
     use hypervisor::xen::Xen;
     use hypervisor::xen::XenVm;
 
     let device_path = device_path.unwrap_or(Path::new(XEN_PATH));
     let xen = Xen::new_with_path(device_path)
-        .with_context(|| format!("failed to open KVM device {}", device_path.display()))?;
+        .with_context(|| format!("failed to open Xen device {}", device_path.display()))?;
 
     let arch_memory_layout =
         Arch::arch_memory_layout(&components).context("failed to create arch memory layout")?;
+    let guest_mem = create_guest_memory(&cfg, &components, &arch_memory_layout, &xen)?;
 
-    let exit_state = ExitState::Stop;
-    Ok(exit_state)
+    let vm =
+        Arc::new(XenVm::new(&xen, guest_mem, components.hv_cfg).context("failed to create vm")?);
+
+    // No used for basic Xen guest support atm
+    let ioapic_host_tube: Option<Tube> = None;
+    #[cfg(feature = "swap")]
+    let swap_controller: Option<SwapController> = None;
+
+    let exit_state = run_vm(
+        cfg,
+        components,
+        &arch_memory_layout,
+        // Keep a reference so the VM outlives its vCPU and device fds; see drop(vm) below.
+        vm.clone(),
+Arc::new(XenIrqChip::new(vm)?),
+        ioapic_host_tube,
+        #[cfg(feature = "swap")]
+        swap_controller,
+    );
+
+    exit_state
 }
 
 #[cfg(all(target_arch = "aarch64", feature = "gunyah"))]

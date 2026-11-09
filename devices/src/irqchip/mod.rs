@@ -23,7 +23,9 @@ use crate::IrqLevelEvent;
 cfg_if::cfg_if! {
     if #[cfg(any(target_os = "android", target_os = "linux"))] {
         mod kvm;
+        mod xen;
         pub use self::kvm::KvmKernelIrqChip;
+        pub use self::xen::XenIrqChip;
         #[cfg(target_arch = "x86_64")]
         pub use self::kvm::KvmSplitIrqChip;
         #[cfg(target_arch = "aarch64")]
