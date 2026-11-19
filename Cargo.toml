@@ -378,6 +378,9 @@ gunyah = ["devices/gunyah", "hypervisor/gunyah"]
 ## Enables the use of the Halla hypervisor
 halla = ["devices/halla", "hypervisor/halla"]
 
+## Enables the use of the Xen hypervisor
+xen = ["hypervisor/xen"]
+
 ## Enables the Linux trace_marker backend for cros_tracing. This backend is only
 ## supported on Linux systems. It sends all cros_tracing tracepoints to the tracefs
 ## filesystem if mounted, for easier debugging with tools like trace-cmd.

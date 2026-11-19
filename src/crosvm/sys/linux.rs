@@ -210,7 +210,6 @@ use crate::crosvm::sys::linux::pci_hotplug_helpers::PciHotplugResourceCarrier;
 use crate::crosvm::sys::platform::vcpu::VcpuPidTid;
 
 const KVM_PATH: &str = "/dev/kvm";
-const XEN_PATH: &str = "/dev/xen/hypercall";
 #[cfg(all(target_arch = "aarch64", feature = "geniezone"))]
 const GENIEZONE_PATH: &str = "/dev/gzvm";
 #[cfg(all(target_arch = "aarch64", feature = "gunyah"))]
@@ -1949,9 +1948,8 @@ fn run_xen(device_path: Option<&Path>, cfg: Config, components: VmComponents) ->
     use hypervisor::xen::Xen;
     use hypervisor::xen::XenVm;
 
-    let device_path = device_path.unwrap_or(Path::new(XEN_PATH));
-    let xen = Xen::new_with_path(device_path)
-        .with_context(|| format!("failed to open Xen device {}", device_path.display()))?;
+    let xen = Xen::new()
+        .context("failed to initialize Xen interface")?;
 
     let arch_memory_layout =
         Arch::arch_memory_layout(&components).context("failed to create arch memory layout")?;

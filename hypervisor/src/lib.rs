@@ -18,6 +18,7 @@ pub mod halla;
 pub mod haxm;
 #[cfg(any(target_os = "android", target_os = "linux"))]
 pub mod kvm;
+#[cfg(all(target_os = "linux", target_arch = "aarch64", feature = "xen"))]
 pub mod xen;
 #[cfg(target_arch = "riscv64")]
 pub mod riscv64;

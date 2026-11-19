@@ -10,15 +10,18 @@ use hypervisor::xen::XenVm;
 use hypervisor::xen::XenVcpu;
 use hypervisor::DeviceKind;
 use base::Tube;
-use hypervisor::IoapicState;
+#[cfg(target_arch = "x86_64")]
+use hypervisor::{
+    IoapicState,
+    LapicState,
+    PicSelect,
+    PicState,
+    PitState,
+};
 use hypervisor::IrqRoute;
 use hypervisor::IrqSource;
 use hypervisor::IrqSourceChip;
-use hypervisor::LapicState;
 use hypervisor::MPState;
-use hypervisor::PicSelect;
-use hypervisor::PicState;
-use hypervisor::PitState;
 use hypervisor::Vcpu;
 use hypervisor::VcpuArch;
 use resources::SystemAllocator;
