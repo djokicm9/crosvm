@@ -27,8 +27,9 @@ pub enum HypervisorKind {
     Kvm {
         device: Option<PathBuf>,
     },
+    #[cfg(all(target_arch = "aarch64", feature = "xen"))]
     Xen {
-        device: Option<PathBuf>,
+        domid: u16,
     },
     #[cfg(target_arch = "aarch64")]
     #[cfg(feature = "halla")]

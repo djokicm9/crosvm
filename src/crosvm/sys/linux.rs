@@ -1943,39 +1943,84 @@ fn run_kvm(device_path: Option<&Path>, cfg: Config, components: VmComponents) ->
     exit_state
 }
 
-fn run_xen(device_path: Option<&Path>, cfg: Config, components: VmComponents) -> Result<ExitState> {
+#[cfg(all(target_arch = "aarch64", feature = "xen"))]
+fn run_xen(domid: u16, cfg: Config, components: VmComponents) -> Result<ExitState> {
     use devices::XenIrqChip;
     use hypervisor::xen::Xen;
     use hypervisor::xen::XenVm;
+    use hypervisor::xen::XenIoreqServer;
+
+    // TODO: Using predefined guest MMIO regions, should be provided from Xen
+    // for the target guest device
+    const TEST_MMIO_BASE: u64 = 0x0a00_0000;
+    const TEST_MMIO_SIZE: u64 = 0x1000;
 
     let xen = Xen::new()
         .context("failed to initialize Xen interface")?;
 
+    let nr_vcpus = xen.nr_vcpus(domid)?;
+
+    let mut ioreq_server = XenIoreqServer::new(&xen, domid)?;
+
+    // Map the shared IOREQ page.
+    let mapping = xen.map_ioreq_page(domid, &ioreq_server)?;
+
+    ioreq_server.set_mapping(mapping);
+
+    // Enable the IOREQ server.
+    ioreq_server.enable(&xen)?;
+
+    // Bind event channels for all guest vCPUs.
+    ioreq_server.bind_vcpu_event_channels(&xen, nr_vcpus)?;
+
+    info!(
+        "IOREQ server initialized for domid {}, vCPUs: {}",
+        domid,
+        nr_vcpus
+    );
+
+    ioreq_server.register_mmio_range(
+        &xen,
+        TEST_MMIO_BASE,
+        TEST_MMIO_SIZE,
+    )?;
+
+    // TODO: Running internal loop that process guest MMIO accesses
+    // Integrate the runtime loop into run_vm()/run_control() if feasible
+    ioreq_server.run_event_loop(&xen)?;
+
+// TODO: This code is left disabled for future restructuring since it's a common
+// sequence for all hypervisors. Determine if structures created here
+// (irq chip, guest memory, etc.) are needed for target Xen virtio-backend-only
+// functionality, as well as run_vm/run_control loop
+#[cfg(any())]
+{
     let arch_memory_layout =
         Arch::arch_memory_layout(&components).context("failed to create arch memory layout")?;
     let guest_mem = create_guest_memory(&cfg, &components, &arch_memory_layout, &xen)?;
 
     let vm =
-        Arc::new(XenVm::new(&xen, guest_mem, components.hv_cfg).context("failed to create vm")?);
-
-    // No used for basic Xen guest support atm
-    let ioapic_host_tube: Option<Tube> = None;
-    #[cfg(feature = "swap")]
-    let swap_controller: Option<SwapController> = None;
-
-    let exit_state = run_vm(
-        cfg,
-        components,
-        &arch_memory_layout,
-        // Keep a reference so the VM outlives its vCPU and device fds; see drop(vm) below.
-        vm.clone(),
-Arc::new(XenIrqChip::new(vm)?),
-        ioapic_host_tube,
+        Arc::new(XenVm::new(&xen, domid, guest_mem, components.hv_cfg).context("failed to create vm")?);
+        // No used for basic Xen guest support atm
+        let ioapic_host_tube: Option<Tube> = None;
         #[cfg(feature = "swap")]
-        swap_controller,
-    );
+        let swap_controller: Option<SwapController> = None;
 
-    exit_state
+        let exit_state = run_vm(
+            cfg,
+            components,
+            &arch_memory_layout,
+            // Keep a reference so the VM outlives its vCPU and device fds; see drop(vm) below.
+            vm.clone(),
+        Arc::new(XenIrqChip::new(vm)?),
+            ioapic_host_tube,
+            #[cfg(feature = "swap")]
+            swap_controller,
+        );
+
+        exit_state
+}
+    Ok(ExitState::Stop)
 }
 
 #[cfg(all(target_arch = "aarch64", feature = "gunyah"))]
@@ -2094,7 +2139,8 @@ pub fn run_config(cfg: Config) -> Result<ExitState> {
 
     match hypervisor {
         HypervisorKind::Kvm { device } => run_kvm(device.as_deref(), cfg, components),
-        HypervisorKind::Xen { device } => run_xen(device.as_deref(), cfg, components),
+        #[cfg(all(target_arch = "aarch64", feature = "xen"))]
+        HypervisorKind::Xen { domid } => run_xen(domid, cfg, components),
         #[cfg(all(target_arch = "aarch64", feature = "geniezone"))]
         HypervisorKind::Geniezone { device } => run_gz(device.as_deref(), cfg, components),
         #[cfg(target_arch = "aarch64")]

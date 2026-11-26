@@ -5,5 +5,7 @@
 #include <xendevicemodel.h>
 #include <xenevtchn.h>
 #include <xenforeignmemory.h>
+#include <xen/memory.h>
+#include <xen/hvm/ioreq.h>
 
 #endif

@@ -471,7 +471,6 @@ pub const SEGBASE_GS_KERNEL: u32 = 2;
 pub const SEGBASE_GS_USER_SEL: u32 = 3;
 pub const _VGCF_in_syscall: u32 = 8;
 pub const VGCF_in_syscall: u32 = 256;
-pub const VGCF_IN_SYSCALL: u32 = 256;
 pub const PRI_xen_pfn: &[u8; 3] = b"lx\0";
 pub const PRIu_xen_pfn: &[u8; 3] = b"lu\0";
 pub const XEN_HAVE_PV_GUEST_ENTRY: u32 = 1;
@@ -481,8 +480,6 @@ pub const FIRST_RESERVED_GDT_BYTE: u32 = 57344;
 pub const FIRST_RESERVED_GDT_ENTRY: u32 = 7168;
 pub const XEN_LEGACY_MAX_VCPUS: u32 = 32;
 pub const PRI_xen_ulong: &[u8; 3] = b"lx\0";
-pub const VGCF_I387_VALID: u32 = 1;
-pub const VGCF_IN_KERNEL: u32 = 4;
 pub const _VGCF_i387_valid: u32 = 0;
 pub const VGCF_i387_valid: u32 = 1;
 pub const _VGCF_in_kernel: u32 = 2;
@@ -874,7 +871,7 @@ pub const XENMEM_resource_grant_table_id_shared: u32 = 0;
 pub const XENMEM_resource_grant_table_id_status: u32 = 1;
 pub const XENMEM_resource_ioreq_server_frame_bufioreq: u32 = 0;
 pub const XENMEM_get_vnumainfo: u32 = 26;
-pub const XEN_DOMCTL_INTERFACE_VERSION: u32 = 23;
+pub const XEN_DOMCTL_INTERFACE_VERSION: u32 = 25;
 pub const _XEN_DOMCTL_CDF_hvm: u32 = 0;
 pub const XEN_DOMCTL_CDF_hvm: u32 = 1;
 pub const _XEN_DOMCTL_CDF_hap: u32 = 1;
@@ -890,7 +887,8 @@ pub const XEN_DOMCTL_CDF_iommu: u32 = 32;
 pub const _XEN_DOMCTL_CDF_nested_virt: u32 = 6;
 pub const XEN_DOMCTL_CDF_nested_virt: u32 = 64;
 pub const XEN_DOMCTL_CDF_vpmu: u32 = 128;
-pub const XEN_DOMCTL_CDF_MAX: u32 = 128;
+pub const XEN_DOMCTL_CDF_trap_unmapped_accesses: u32 = 256;
+pub const XEN_DOMCTL_CDF_MAX: u32 = 256;
 pub const _XEN_DOMCTL_IOMMU_no_sharept: u32 = 0;
 pub const XEN_DOMCTL_IOMMU_no_sharept: u32 = 1;
 pub const XEN_DOMCTL_IOMMU_MAX: u32 = 1;
@@ -1038,6 +1036,13 @@ pub const XEN_DOMCTL_vmtrace_reset_and_enable: u32 = 3;
 pub const XEN_DOMCTL_vmtrace_output_position: u32 = 4;
 pub const XEN_DOMCTL_vmtrace_get_option: u32 = 5;
 pub const XEN_DOMCTL_vmtrace_set_option: u32 = 6;
+pub const XEN_DOMCTL_GETDOMSTATE_STATE_EXIST: u32 = 1;
+pub const XEN_DOMCTL_GETDOMSTATE_STATE_SHUTDOWN: u32 = 2;
+pub const XEN_DOMCTL_GETDOMSTATE_STATE_DYING: u32 = 4;
+pub const XEN_DOMCTL_GETDOMSTATE_STATE_DEAD: u32 = 8;
+pub const XEN_DOMCTL_GETDOMSTATE_CAP_CONTROL: u32 = 1;
+pub const XEN_DOMCTL_GETDOMSTATE_CAP_HARDWARE: u32 = 2;
+pub const XEN_DOMCTL_GETDOMSTATE_CAP_XENSTORE: u32 = 4;
 pub const XEN_DOMCTL_createdomain: u32 = 1;
 pub const XEN_DOMCTL_destroydomain: u32 = 2;
 pub const XEN_DOMCTL_pausedomain: u32 = 3;
@@ -1111,11 +1116,13 @@ pub const XEN_DOMCTL_set_paging_mempool_size: u32 = 86;
 pub const XEN_DOMCTL_dt_overlay: u32 = 87;
 pub const XEN_DOMCTL_gsi_permission: u32 = 88;
 pub const XEN_DOMCTL_set_llc_colors: u32 = 89;
+pub const XEN_DOMCTL_get_domain_state: u32 = 90;
+pub const XEN_DOMCTL_viommu_alloc_vsid_range: u32 = 91;
 pub const XEN_DOMCTL_gdbsx_guestmemio: u32 = 1000;
 pub const XEN_DOMCTL_gdbsx_pausevcpu: u32 = 1001;
 pub const XEN_DOMCTL_gdbsx_unpausevcpu: u32 = 1002;
 pub const XEN_DOMCTL_gdbsx_domstatus: u32 = 1003;
-pub const XEN_SYSCTL_INTERFACE_VERSION: u32 = 21;
+pub const XEN_SYSCTL_INTERFACE_VERSION: u32 = 22;
 pub const XEN_SYSCTL_TBUFOP_get_info: u32 = 0;
 pub const XEN_SYSCTL_TBUFOP_set_cpu_mask: u32 = 1;
 pub const XEN_SYSCTL_TBUFOP_set_evt_mask: u32 = 2;
@@ -1164,11 +1171,13 @@ pub const XEN_SYSCTL_CPPC_SET_ENERGY_PERF: u32 = 8;
 pub const XEN_SYSCTL_CPPC_SET_ACT_WINDOW: u32 = 16;
 pub const XEN_SYSCTL_CPPC_SET_PRESET_MASK: u32 = 4026531840;
 pub const XEN_SYSCTL_CPPC_SET_PRESET_NONE: u32 = 0;
-pub const XEN_SYSCTL_CPPC_SET_PRESET_BALANCE: u32 = 268435456;
+pub const XEN_SYSCTL_CPPC_SET_PRESET_ONDEMAND: u32 = 268435456;
 pub const XEN_SYSCTL_CPPC_SET_PRESET_POWERSAVE: u32 = 536870912;
 pub const XEN_SYSCTL_CPPC_SET_PRESET_PERFORMANCE: u32 = 805306368;
 pub const XEN_SYSCTL_CPPC_SET_PARAM_MASK: u32 = 4026531871;
 pub const XEN_SYSCTL_CPPC_ACT_WINDOW_MASK: u32 = 1023;
+pub const XEN_AMD_CPPC_DRIVER_NAME: &[u8; 9] = b"amd-cppc\0";
+pub const XEN_AMD_CPPC_EPP_DRIVER_NAME: &[u8; 13] = b"amd-cppc-epp\0";
 pub const XEN_HWP_DRIVER_NAME: &[u8; 4] = b"hwp\0";
 pub const CPUFREQ_NAME_LEN: u32 = 16;
 pub const SCALING_MAX_FREQ: u32 = 1;
@@ -1183,6 +1192,7 @@ pub const SET_CPUFREQ_GOV: u32 = 18;
 pub const SET_CPUFREQ_PARA: u32 = 19;
 pub const GET_CPUFREQ_AVGFREQ: u32 = 20;
 pub const SET_CPUFREQ_CPPC: u32 = 21;
+pub const GET_CPUFREQ_CPPC: u32 = 22;
 pub const XEN_SYSCTL_pm_op_set_sched_opt_smt: u32 = 33;
 pub const XEN_SYSCTL_pm_op_get_max_cstate: u32 = 34;
 pub const XEN_SYSCTL_pm_op_set_max_cstate: u32 = 35;
@@ -1256,15 +1266,6 @@ pub const XEN_SYSCTL_PSR_get_l2_info: u32 = 1;
 pub const XEN_SYSCTL_PSR_get_mba_info: u32 = 2;
 pub const XEN_SYSCTL_PSR_CAT_L3_CDP: u32 = 1;
 pub const XEN_SYSCTL_PSR_MBA_LINEAR: u32 = 1;
-pub const XEN_SYSCTL_CPU_LEVELCAP_faulting: u32 = 1;
-pub const XEN_SYSCTL_CPU_LEVELCAP_ecx: u32 = 2;
-pub const XEN_SYSCTL_CPU_LEVELCAP_edx: u32 = 4;
-pub const XEN_SYSCTL_CPU_LEVELCAP_extd_ecx: u32 = 8;
-pub const XEN_SYSCTL_CPU_LEVELCAP_extd_edx: u32 = 16;
-pub const XEN_SYSCTL_CPU_LEVELCAP_xsave_eax: u32 = 32;
-pub const XEN_SYSCTL_CPU_LEVELCAP_thermal_ecx: u32 = 64;
-pub const XEN_SYSCTL_CPU_LEVELCAP_l7s0_eax: u32 = 128;
-pub const XEN_SYSCTL_CPU_LEVELCAP_l7s0_ebx: u32 = 256;
 pub const XEN_SYSCTL_cpu_featureset_raw: u32 = 0;
 pub const XEN_SYSCTL_cpu_featureset_host: u32 = 1;
 pub const XEN_SYSCTL_cpu_featureset_pv: u32 = 2;
@@ -1314,7 +1315,6 @@ pub const XEN_SYSCTL_coverage_op: u32 = 20;
 pub const XEN_SYSCTL_psr_cmt_op: u32 = 21;
 pub const XEN_SYSCTL_pcitopoinfo: u32 = 22;
 pub const XEN_SYSCTL_psr_alloc: u32 = 23;
-pub const XEN_SYSCTL_get_cpu_levelling_caps: u32 = 25;
 pub const XEN_SYSCTL_get_cpu_featureset: u32 = 26;
 pub const XEN_SYSCTL_livepatch_op: u32 = 27;
 pub const XEN_SYSCTL_get_cpu_policy: u32 = 29;
@@ -1649,7 +1649,9 @@ pub const _HVMPV_no_vp_limit: u32 = 11;
 pub const HVMPV_no_vp_limit: u32 = 2048;
 pub const _HVMPV_cpu_hotplug: u32 = 12;
 pub const HVMPV_cpu_hotplug: u32 = 4096;
-pub const HVMPV_feature_mask: u32 = 8191;
+pub const _HVMPV_stimer_direct: u32 = 13;
+pub const HVMPV_stimer_direct: u32 = 8192;
+pub const HVMPV_feature_mask: u32 = 16383;
 pub const HVM_PARAM_TIMER_MODE: u32 = 10;
 pub const HVMPTM_delay_for_missed_ticks: u32 = 0;
 pub const HVMPTM_no_delay_for_missed_ticks: u32 = 1;
@@ -1705,12 +1707,9 @@ pub const FLASK_DEL_OCONTEXT: u32 = 22;
 pub const FLASK_GET_PEER_SID: u32 = 23;
 pub const FLASK_RELABEL_DOMAIN: u32 = 24;
 pub const FLASK_DEVICETREE_LABEL: u32 = 25;
-pub const KEXEC_XEN_NO_PAGES: u32 = 17;
 pub const KEXEC_TYPE_DEFAULT: u32 = 0;
 pub const KEXEC_TYPE_CRASH: u32 = 1;
 pub const KEXEC_CMD_kexec: u32 = 0;
-pub const KEXEC_CMD_kexec_load_v1: u32 = 1;
-pub const KEXEC_CMD_kexec_unload_v1: u32 = 2;
 pub const KEXEC_RANGE_MA_CRASH: u32 = 0;
 pub const KEXEC_RANGE_MA_XEN: u32 = 1;
 pub const KEXEC_RANGE_MA_CPU: u32 = 2;
@@ -1780,10 +1779,13 @@ pub const XEN_PM_CX: u32 = 0;
 pub const XEN_PM_PX: u32 = 1;
 pub const XEN_PM_TX: u32 = 2;
 pub const XEN_PM_PDC: u32 = 3;
+pub const XEN_PM_CPPC: u32 = 4;
 pub const XEN_PX_PCT: u32 = 1;
 pub const XEN_PX_PSS: u32 = 2;
 pub const XEN_PX_PPC: u32 = 4;
 pub const XEN_PX_PSD: u32 = 8;
+pub const XEN_CPPC_PSD: u32 = 1;
+pub const XEN_CPPC_CPC: u32 = 2;
 pub const XEN_CPUPERF_SHARED_TYPE_HW: u32 = 1;
 pub const XEN_CPUPERF_SHARED_TYPE_ALL: u32 = 2;
 pub const XEN_CPUPERF_SHARED_TYPE_ANY: u32 = 3;
@@ -1936,6 +1938,33 @@ pub const E820MAX: u32 = 128;
 pub const XC_MAX_ERROR_MSG_LEN: u32 = 1024;
 pub const XC_MSR_INPUT_UNUSED: u32 = 4294967295;
 pub const XENEVTCHN_NO_CLOEXEC: u32 = 1;
+pub const IOREQ_READ: u32 = 1;
+pub const IOREQ_WRITE: u32 = 0;
+pub const STATE_IOREQ_NONE: u32 = 0;
+pub const STATE_IOREQ_READY: u32 = 1;
+pub const STATE_IOREQ_INPROCESS: u32 = 2;
+pub const STATE_IORESP_READY: u32 = 3;
+pub const IOREQ_TYPE_PIO: u32 = 0;
+pub const IOREQ_TYPE_COPY: u32 = 1;
+pub const IOREQ_TYPE_PCI_CONFIG: u32 = 2;
+pub const IOREQ_TYPE_TIMEOFFSET: u32 = 7;
+pub const IOREQ_TYPE_INVALIDATE: u32 = 8;
+pub const IOREQ_BUFFER_SLOT_NUM: u32 = 511;
+pub const ACPI_PM1A_EVT_BLK_ADDRESS_V0: u32 = 8000;
+pub const ACPI_PM1A_CNT_BLK_ADDRESS_V0: u32 = 8004;
+pub const ACPI_PM_TMR_BLK_ADDRESS_V0: u32 = 8008;
+pub const ACPI_GPE0_BLK_ADDRESS_V0: u32 = 8040;
+pub const ACPI_GPE0_BLK_LEN_V0: u32 = 8;
+pub const ACPI_PM1A_EVT_BLK_ADDRESS_V1: u32 = 45056;
+pub const ACPI_PM1A_CNT_BLK_ADDRESS_V1: u32 = 45060;
+pub const ACPI_PM_TMR_BLK_ADDRESS_V1: u32 = 45064;
+pub const ACPI_GPE0_BLK_ADDRESS_V1: u32 = 45024;
+pub const ACPI_GPE0_BLK_LEN_V1: u32 = 4;
+pub const ACPI_PM1A_EVT_BLK_ADDRESS: u32 = 8000;
+pub const ACPI_PM1A_CNT_BLK_ADDRESS: u32 = 8004;
+pub const ACPI_PM_TMR_BLK_ADDRESS: u32 = 8008;
+pub const ACPI_GPE0_BLK_ADDRESS: u32 = 8040;
+pub const ACPI_GPE0_BLK_LEN: u32 = 8;
 pub type __u_char = ::std::os::raw::c_uchar;
 pub type __u_short = ::std::os::raw::c_ushort;
 pub type __u_int = ::std::os::raw::c_uint;
@@ -7288,6 +7317,8 @@ pub struct hvm_hw_rtc {
     pub cmos_index: u8,
     pub pad0: u8,
     pub rtc_offset: i64,
+    pub century: u8,
+    pub pad1: [u8; 7usize],
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -9216,10 +9247,16 @@ pub struct xen_domctl_createdomain {
     pub max_grant_frames: i32,
     pub max_maptrack_frames: i32,
     pub grant_opts: u32,
-    pub altp2m_opts: u32,
+    pub altp2m: xen_domctl_createdomain__bindgen_ty_1,
     pub vmtrace_size: u32,
     pub cpupool_id: u32,
     pub arch: xen_arch_domainconfig,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct xen_domctl_createdomain__bindgen_ty_1 {
+    pub opts: u16,
+    pub nr: u16,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -10208,6 +10245,23 @@ impl Default for xen_domctl_set_llc_colors {
     }
 }
 #[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct xen_domctl_get_domain_state {
+    pub state: u16,
+    pub caps: u16,
+    pub pad0: u32,
+    pub unique_id: u64,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct xen_domctl_viommu_alloc_vsid_range {
+    pub first_psid: u32,
+    pub phandle: u32,
+    pub nr_sids: u16,
+    pub pad: u16,
+    pub first_vsid: u32,
+}
+#[repr(C)]
 #[derive(Copy, Clone)]
 pub struct xen_domctl {
     pub cmd: u32,
@@ -10273,6 +10327,8 @@ pub union xen_domctl__bindgen_ty_1 {
     pub vmtrace_op: xen_domctl_vmtrace_op,
     pub paging_mempool: xen_domctl_paging_mempool,
     pub set_llc_colors: xen_domctl_set_llc_colors,
+    pub get_domain_state: xen_domctl_get_domain_state,
+    pub viommu_alloc_vsid_range: xen_domctl_viommu_alloc_vsid_range,
     pub pad: [u8; 128usize],
 }
 impl Default for xen_domctl__bindgen_ty_1 {
@@ -10372,7 +10428,7 @@ pub struct xen_sysctl_physinfo {
     pub cpu_khz: u32,
     pub capabilities: u32,
     pub arch_capabilities: u32,
-    pub pad: u32,
+    pub arm_clock_frequency_hz: u32,
     pub total_pages: u64,
     pub free_pages: u64,
     pub scrub_pages: u64,
@@ -10695,7 +10751,7 @@ pub struct xen_ondemand {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct xen_cppc_para {
+pub struct xen_get_cppc_para {
     pub features: u32,
     pub lowest: u32,
     pub lowest_nonlinear: u32,
@@ -10730,38 +10786,23 @@ pub struct xen_get_cpufreq_para {
     pub cpuinfo_cur_freq: u32,
     pub cpuinfo_max_freq: u32,
     pub cpuinfo_min_freq: u32,
-    pub u: xen_get_cpufreq_para__bindgen_ty_1,
+    pub s: xen_get_cpufreq_para__bindgen_ty_1,
     pub turbo_enabled: i32,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub union xen_get_cpufreq_para__bindgen_ty_1 {
-    pub s: xen_get_cpufreq_para__bindgen_ty_1__bindgen_ty_1,
-    pub cppc_para: xen_cppc_para,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct xen_get_cpufreq_para__bindgen_ty_1__bindgen_ty_1 {
+pub struct xen_get_cpufreq_para__bindgen_ty_1 {
     pub scaling_cur_freq: u32,
     pub scaling_governor: [::std::os::raw::c_char; 16usize],
     pub scaling_max_freq: u32,
     pub scaling_min_freq: u32,
-    pub u: xen_get_cpufreq_para__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1,
+    pub u: xen_get_cpufreq_para__bindgen_ty_1__bindgen_ty_1,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub union xen_get_cpufreq_para__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1 {
+pub union xen_get_cpufreq_para__bindgen_ty_1__bindgen_ty_1 {
     pub userspace: xen_userspace,
     pub ondemand: xen_ondemand,
-}
-impl Default for xen_get_cpufreq_para__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1 {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
 }
 impl Default for xen_get_cpufreq_para__bindgen_ty_1__bindgen_ty_1 {
     fn default() -> Self {
@@ -10812,6 +10853,7 @@ pub struct xen_sysctl_pm_op {
 #[derive(Copy, Clone)]
 pub union xen_sysctl_pm_op__bindgen_ty_1 {
     pub get_para: xen_get_cpufreq_para,
+    pub get_cppc: xen_get_cppc_para,
     pub set_gov: xen_set_cpufreq_gov,
     pub set_para: xen_set_cpufreq_para,
     pub set_cppc: xen_set_cppc_para,
@@ -11109,6 +11151,11 @@ pub struct xen_sysctl_credit2_schedule {
     pub ratelimit_us: u32,
 }
 #[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct xen_sysctl_rtds_schedule {
+    pub admission_control_enabled: u8,
+}
+#[repr(C)]
 #[derive(Copy, Clone)]
 pub struct xen_sysctl_scheduler_op {
     pub cpupool_id: u32,
@@ -11122,6 +11169,7 @@ pub union xen_sysctl_scheduler_op__bindgen_ty_1 {
     pub sched_arinc653: xen_sysctl_scheduler_op__bindgen_ty_1_xen_sysctl_sched_arinc653,
     pub sched_credit: xen_sysctl_credit_schedule,
     pub sched_credit2: xen_sysctl_credit2_schedule,
+    pub sched_rtds: xen_sysctl_rtds_schedule,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -11268,11 +11316,6 @@ impl Default for xen_sysctl_psr_alloc {
             s.assume_init()
         }
     }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct xen_sysctl_cpu_levelling_caps {
-    pub caps: u32,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -11527,7 +11570,6 @@ pub union xen_sysctl__bindgen_ty_1 {
     pub coverage_op: xen_sysctl_coverage_op,
     pub psr_cmt_op: xen_sysctl_psr_cmt_op,
     pub psr_alloc: xen_sysctl_psr_alloc,
-    pub cpu_levelling_caps: xen_sysctl_cpu_levelling_caps,
     pub cpu_featureset: xen_sysctl_cpu_featureset,
     pub livepatch: xen_sysctl_livepatch_op,
     pub cpu_policy: xen_sysctl_cpu_policy,
@@ -13031,25 +13073,10 @@ impl Default for __guest_handle_const_xen_flask_op_t {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct xen_kexec_image {
-    pub page_list: [::std::os::raw::c_ulong; 17usize],
-    pub indirection_page: ::std::os::raw::c_ulong,
-    pub start_address: ::std::os::raw::c_ulong,
-}
-pub type xen_kexec_image_t = xen_kexec_image;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
 pub struct xen_kexec_exec {
     pub type_: ::std::os::raw::c_int,
 }
 pub type xen_kexec_exec_t = xen_kexec_exec;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct xen_kexec_load_v1 {
-    pub type_: ::std::os::raw::c_int,
-    pub image: xen_kexec_image_t,
-}
-pub type xen_kexec_load_v1_t = xen_kexec_load_v1;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct xen_kexec_range {
@@ -14371,6 +14398,26 @@ impl Default for __guest_handle_const_xen_processor_performance_t {
     }
 }
 #[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct xen_processor_cppc {
+    pub flags: u8,
+    pub pad: [u8; 3usize],
+    pub cpc: xen_processor_cppc__bindgen_ty_1,
+    pub shared_type: u32,
+    pub domain_info: xen_psd_package,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct xen_processor_cppc__bindgen_ty_1 {
+    pub highest_perf: u32,
+    pub nominal_perf: u32,
+    pub lowest_nonlinear_perf: u32,
+    pub lowest_perf: u32,
+    pub lowest_mhz: u32,
+    pub nominal_mhz: u32,
+}
+pub type xen_processor_cppc_t = xen_processor_cppc;
+#[repr(C)]
 #[derive(Copy, Clone)]
 pub struct xenpf_set_processor_pminfo {
     pub id: u32,
@@ -14383,6 +14430,7 @@ pub union xenpf_set_processor_pminfo__bindgen_ty_1 {
     pub power: xen_processor_power,
     pub perf: xen_processor_performance,
     pub pdc: __guest_handle_uint32,
+    pub cppc_data: xen_processor_cppc_t,
 }
 impl Default for xenpf_set_processor_pminfo__bindgen_ty_1 {
     fn default() -> Self {
@@ -16695,6 +16743,20 @@ unsafe extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 unsafe extern "C" {
+    pub fn xc_sched_rtds_params_set(
+        xch: *mut xc_interface,
+        cpupool_id: u32,
+        schedule: *mut xen_sysctl_rtds_schedule,
+    ) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn xc_sched_rtds_params_get(
+        xch: *mut xc_interface,
+        cpupool_id: u32,
+        schedule: *mut xen_sysctl_rtds_schedule,
+    ) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
     pub fn xc_sched_arinc653_schedule_set(
         xch: *mut xc_interface,
         cpupool_id: u32,
@@ -17906,7 +17968,7 @@ unsafe extern "C" {
 }
 pub type xc_userspace_t = xen_userspace;
 pub type xc_ondemand_t = xen_ondemand;
-pub type xc_cppc_para_t = xen_cppc_para;
+pub type xc_cppc_para_t = xen_get_cppc_para;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct xc_get_cpufreq_para {
@@ -17920,38 +17982,23 @@ pub struct xc_get_cpufreq_para {
     pub cpuinfo_cur_freq: u32,
     pub cpuinfo_max_freq: u32,
     pub cpuinfo_min_freq: u32,
-    pub u: xc_get_cpufreq_para__bindgen_ty_1,
+    pub s: xc_get_cpufreq_para__bindgen_ty_1,
     pub turbo_enabled: i32,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub union xc_get_cpufreq_para__bindgen_ty_1 {
-    pub s: xc_get_cpufreq_para__bindgen_ty_1__bindgen_ty_1,
-    pub cppc_para: xc_cppc_para_t,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct xc_get_cpufreq_para__bindgen_ty_1__bindgen_ty_1 {
+pub struct xc_get_cpufreq_para__bindgen_ty_1 {
     pub scaling_cur_freq: u32,
     pub scaling_governor: [::std::os::raw::c_char; 16usize],
     pub scaling_max_freq: u32,
     pub scaling_min_freq: u32,
-    pub u: xc_get_cpufreq_para__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1,
+    pub u: xc_get_cpufreq_para__bindgen_ty_1__bindgen_ty_1,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub union xc_get_cpufreq_para__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1 {
+pub union xc_get_cpufreq_para__bindgen_ty_1__bindgen_ty_1 {
     pub userspace: xc_userspace_t,
     pub ondemand: xc_ondemand_t,
-}
-impl Default for xc_get_cpufreq_para__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1 {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
 }
 impl Default for xc_get_cpufreq_para__bindgen_ty_1__bindgen_ty_1 {
     fn default() -> Self {
@@ -18008,6 +18055,13 @@ unsafe extern "C" {
         xch: *mut xc_interface,
         cpuid: ::std::os::raw::c_int,
         set_cppc: *mut xc_set_cppc_para_t,
+    ) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn xc_get_cppc_para(
+        xch: *mut xc_interface,
+        cpuid: ::std::os::raw::c_uint,
+        cppc_para: *mut xc_cppc_para_t,
     ) -> ::std::os::raw::c_int;
 }
 unsafe extern "C" {
@@ -18514,7 +18568,6 @@ unsafe extern "C" {
     pub fn xc_flask_context_to_sid(
         xc_handle: *mut xc_interface,
         buf: *mut ::std::os::raw::c_char,
-        size: u32,
         sid: *mut u32,
     ) -> ::std::os::raw::c_int;
 }
@@ -18948,6 +19001,16 @@ unsafe extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 unsafe extern "C" {
+    pub fn xc_domain_viommu_allocate_vsid_range(
+        xch: *mut xc_interface,
+        domid: u32,
+        nr_sids: u16,
+        first_psid: u32,
+        phandle: u32,
+        first_vsid: *mut u32,
+    ) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
     pub fn xendevicemodel_open(
         logger: *mut xentoollog_logger,
         open_flags: ::std::os::raw::c_uint,
@@ -19312,6 +19375,410 @@ unsafe extern "C" {
         size: *mut usize,
     ) -> ::std::os::raw::c_int;
 }
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ioreq {
+    pub addr: u64,
+    pub data: u64,
+    pub count: u32,
+    pub size: u32,
+    pub vp_eport: u32,
+    pub _pad0: u16,
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
+    pub type_: u8,
+}
+impl ioreq {
+    #[inline]
+    pub fn state(&self) -> u8 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 4u8) as u8) }
+    }
+    #[inline]
+    pub fn set_state(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::std::mem::transmute(val);
+            self._bitfield_1.set(0usize, 4u8, val as u64)
+        }
+    }
+    #[inline]
+    pub unsafe fn state_raw(this: *const Self) -> u8 {
+        unsafe {
+            ::std::mem::transmute(<__BindgenBitfieldUnit<[u8; 1usize]>>::raw_get(
+                ::std::ptr::addr_of!((*this)._bitfield_1),
+                0usize,
+                4u8,
+            ) as u8)
+        }
+    }
+    #[inline]
+    pub unsafe fn set_state_raw(this: *mut Self, val: u8) {
+        unsafe {
+            let val: u8 = ::std::mem::transmute(val);
+            <__BindgenBitfieldUnit<[u8; 1usize]>>::raw_set(
+                ::std::ptr::addr_of_mut!((*this)._bitfield_1),
+                0usize,
+                4u8,
+                val as u64,
+            )
+        }
+    }
+    #[inline]
+    pub fn data_is_ptr(&self) -> u8 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(4usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_data_is_ptr(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::std::mem::transmute(val);
+            self._bitfield_1.set(4usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub unsafe fn data_is_ptr_raw(this: *const Self) -> u8 {
+        unsafe {
+            ::std::mem::transmute(<__BindgenBitfieldUnit<[u8; 1usize]>>::raw_get(
+                ::std::ptr::addr_of!((*this)._bitfield_1),
+                4usize,
+                1u8,
+            ) as u8)
+        }
+    }
+    #[inline]
+    pub unsafe fn set_data_is_ptr_raw(this: *mut Self, val: u8) {
+        unsafe {
+            let val: u8 = ::std::mem::transmute(val);
+            <__BindgenBitfieldUnit<[u8; 1usize]>>::raw_set(
+                ::std::ptr::addr_of_mut!((*this)._bitfield_1),
+                4usize,
+                1u8,
+                val as u64,
+            )
+        }
+    }
+    #[inline]
+    pub fn dir(&self) -> u8 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(5usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_dir(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::std::mem::transmute(val);
+            self._bitfield_1.set(5usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub unsafe fn dir_raw(this: *const Self) -> u8 {
+        unsafe {
+            ::std::mem::transmute(<__BindgenBitfieldUnit<[u8; 1usize]>>::raw_get(
+                ::std::ptr::addr_of!((*this)._bitfield_1),
+                5usize,
+                1u8,
+            ) as u8)
+        }
+    }
+    #[inline]
+    pub unsafe fn set_dir_raw(this: *mut Self, val: u8) {
+        unsafe {
+            let val: u8 = ::std::mem::transmute(val);
+            <__BindgenBitfieldUnit<[u8; 1usize]>>::raw_set(
+                ::std::ptr::addr_of_mut!((*this)._bitfield_1),
+                5usize,
+                1u8,
+                val as u64,
+            )
+        }
+    }
+    #[inline]
+    pub fn df(&self) -> u8 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(6usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_df(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::std::mem::transmute(val);
+            self._bitfield_1.set(6usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub unsafe fn df_raw(this: *const Self) -> u8 {
+        unsafe {
+            ::std::mem::transmute(<__BindgenBitfieldUnit<[u8; 1usize]>>::raw_get(
+                ::std::ptr::addr_of!((*this)._bitfield_1),
+                6usize,
+                1u8,
+            ) as u8)
+        }
+    }
+    #[inline]
+    pub unsafe fn set_df_raw(this: *mut Self, val: u8) {
+        unsafe {
+            let val: u8 = ::std::mem::transmute(val);
+            <__BindgenBitfieldUnit<[u8; 1usize]>>::raw_set(
+                ::std::ptr::addr_of_mut!((*this)._bitfield_1),
+                6usize,
+                1u8,
+                val as u64,
+            )
+        }
+    }
+    #[inline]
+    pub fn _pad1(&self) -> u8 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(7usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set__pad1(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::std::mem::transmute(val);
+            self._bitfield_1.set(7usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub unsafe fn _pad1_raw(this: *const Self) -> u8 {
+        unsafe {
+            ::std::mem::transmute(<__BindgenBitfieldUnit<[u8; 1usize]>>::raw_get(
+                ::std::ptr::addr_of!((*this)._bitfield_1),
+                7usize,
+                1u8,
+            ) as u8)
+        }
+    }
+    #[inline]
+    pub unsafe fn set__pad1_raw(this: *mut Self, val: u8) {
+        unsafe {
+            let val: u8 = ::std::mem::transmute(val);
+            <__BindgenBitfieldUnit<[u8; 1usize]>>::raw_set(
+                ::std::ptr::addr_of_mut!((*this)._bitfield_1),
+                7usize,
+                1u8,
+                val as u64,
+            )
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        state: u8,
+        data_is_ptr: u8,
+        dir: u8,
+        df: u8,
+        _pad1: u8,
+    ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 4u8, {
+            let state: u8 = unsafe { ::std::mem::transmute(state) };
+            state as u64
+        });
+        __bindgen_bitfield_unit.set(4usize, 1u8, {
+            let data_is_ptr: u8 = unsafe { ::std::mem::transmute(data_is_ptr) };
+            data_is_ptr as u64
+        });
+        __bindgen_bitfield_unit.set(5usize, 1u8, {
+            let dir: u8 = unsafe { ::std::mem::transmute(dir) };
+            dir as u64
+        });
+        __bindgen_bitfield_unit.set(6usize, 1u8, {
+            let df: u8 = unsafe { ::std::mem::transmute(df) };
+            df as u64
+        });
+        __bindgen_bitfield_unit.set(7usize, 1u8, {
+            let _pad1: u8 = unsafe { ::std::mem::transmute(_pad1) };
+            _pad1 as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+pub type ioreq_t = ioreq;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct shared_iopage {
+    pub vcpu_ioreq: [ioreq; 1usize],
+}
+pub type shared_iopage_t = shared_iopage;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct buf_ioreq {
+    pub type_: u8,
+    pub _bitfield_align_1: [u32; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 3usize]>,
+    pub data: u32,
+}
+impl buf_ioreq {
+    #[inline]
+    pub fn pad(&self) -> u8 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_pad(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::std::mem::transmute(val);
+            self._bitfield_1.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub unsafe fn pad_raw(this: *const Self) -> u8 {
+        unsafe {
+            ::std::mem::transmute(<__BindgenBitfieldUnit<[u8; 3usize]>>::raw_get(
+                ::std::ptr::addr_of!((*this)._bitfield_1),
+                0usize,
+                1u8,
+            ) as u8)
+        }
+    }
+    #[inline]
+    pub unsafe fn set_pad_raw(this: *mut Self, val: u8) {
+        unsafe {
+            let val: u8 = ::std::mem::transmute(val);
+            <__BindgenBitfieldUnit<[u8; 3usize]>>::raw_set(
+                ::std::ptr::addr_of_mut!((*this)._bitfield_1),
+                0usize,
+                1u8,
+                val as u64,
+            )
+        }
+    }
+    #[inline]
+    pub fn dir(&self) -> u8 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_dir(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::std::mem::transmute(val);
+            self._bitfield_1.set(1usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub unsafe fn dir_raw(this: *const Self) -> u8 {
+        unsafe {
+            ::std::mem::transmute(<__BindgenBitfieldUnit<[u8; 3usize]>>::raw_get(
+                ::std::ptr::addr_of!((*this)._bitfield_1),
+                1usize,
+                1u8,
+            ) as u8)
+        }
+    }
+    #[inline]
+    pub unsafe fn set_dir_raw(this: *mut Self, val: u8) {
+        unsafe {
+            let val: u8 = ::std::mem::transmute(val);
+            <__BindgenBitfieldUnit<[u8; 3usize]>>::raw_set(
+                ::std::ptr::addr_of_mut!((*this)._bitfield_1),
+                1usize,
+                1u8,
+                val as u64,
+            )
+        }
+    }
+    #[inline]
+    pub fn size(&self) -> u8 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(2usize, 2u8) as u8) }
+    }
+    #[inline]
+    pub fn set_size(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::std::mem::transmute(val);
+            self._bitfield_1.set(2usize, 2u8, val as u64)
+        }
+    }
+    #[inline]
+    pub unsafe fn size_raw(this: *const Self) -> u8 {
+        unsafe {
+            ::std::mem::transmute(<__BindgenBitfieldUnit<[u8; 3usize]>>::raw_get(
+                ::std::ptr::addr_of!((*this)._bitfield_1),
+                2usize,
+                2u8,
+            ) as u8)
+        }
+    }
+    #[inline]
+    pub unsafe fn set_size_raw(this: *mut Self, val: u8) {
+        unsafe {
+            let val: u8 = ::std::mem::transmute(val);
+            <__BindgenBitfieldUnit<[u8; 3usize]>>::raw_set(
+                ::std::ptr::addr_of_mut!((*this)._bitfield_1),
+                2usize,
+                2u8,
+                val as u64,
+            )
+        }
+    }
+    #[inline]
+    pub fn addr(&self) -> u32 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(4usize, 20u8) as u32) }
+    }
+    #[inline]
+    pub fn set_addr(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(4usize, 20u8, val as u64)
+        }
+    }
+    #[inline]
+    pub unsafe fn addr_raw(this: *const Self) -> u32 {
+        unsafe {
+            ::std::mem::transmute(<__BindgenBitfieldUnit<[u8; 3usize]>>::raw_get(
+                ::std::ptr::addr_of!((*this)._bitfield_1),
+                4usize,
+                20u8,
+            ) as u32)
+        }
+    }
+    #[inline]
+    pub unsafe fn set_addr_raw(this: *mut Self, val: u32) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            <__BindgenBitfieldUnit<[u8; 3usize]>>::raw_set(
+                ::std::ptr::addr_of_mut!((*this)._bitfield_1),
+                4usize,
+                20u8,
+                val as u64,
+            )
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        pad: u8,
+        dir: u8,
+        size: u8,
+        addr: u32,
+    ) -> __BindgenBitfieldUnit<[u8; 3usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 3usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let pad: u8 = unsafe { ::std::mem::transmute(pad) };
+            pad as u64
+        });
+        __bindgen_bitfield_unit.set(1usize, 1u8, {
+            let dir: u8 = unsafe { ::std::mem::transmute(dir) };
+            dir as u64
+        });
+        __bindgen_bitfield_unit.set(2usize, 2u8, {
+            let size: u8 = unsafe { ::std::mem::transmute(size) };
+            size as u64
+        });
+        __bindgen_bitfield_unit.set(4usize, 20u8, {
+            let addr: u32 = unsafe { ::std::mem::transmute(addr) };
+            addr as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+pub type buf_ioreq_t = buf_ioreq;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct buffered_iopage {
+    pub read_pointer: u32,
+    pub write_pointer: u32,
+    pub buf_ioreq: [buf_ioreq_t; 511usize],
+}
+impl Default for buffered_iopage {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type buffered_iopage_t = buffered_iopage;
 pub type __builtin_va_list = [__va_list_tag; 1usize];
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]

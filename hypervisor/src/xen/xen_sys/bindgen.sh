@@ -14,5 +14,5 @@ source tools/impl/bindgen-common.sh
 bindgen_generate \
     "hypervisor/src/xen/xen_sys/xc_wrapper.h" \
     -- \
-    -Ixen/dist/usr/local/include/xen \
+    -I/xen/dist/install/usr/local/include \
     > hypervisor/src/xen/xen_sys/bindings.rs
