@@ -21,6 +21,27 @@ use serde_keyvalue::FromKeyValues;
 
 use crate::crosvm::config::Config;
 
+#[cfg(all(target_arch = "aarch64", feature = "xen"))]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct XenGuestConfig {
+    pub domid: u16,
+    pub devices: Vec<XenDeviceConfig>,
+}
+
+#[cfg(all(target_arch = "aarch64", feature = "xen"))]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct XenDeviceConfig {
+    pub name: String,
+    pub region: DeviceRegion,
+}
+
+#[cfg(all(target_arch = "aarch64", feature = "xen"))]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DeviceRegion {
+    pub base: u64,
+    pub size: u64,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, FromKeyValues)]
 #[serde(deny_unknown_fields, rename_all = "kebab-case")]
 pub enum HypervisorKind {
@@ -29,7 +50,7 @@ pub enum HypervisorKind {
     },
     #[cfg(all(target_arch = "aarch64", feature = "xen"))]
     Xen {
-        domid: u16,
+        guest_config: XenGuestConfig,
     },
     #[cfg(target_arch = "aarch64")]
     #[cfg(feature = "halla")]

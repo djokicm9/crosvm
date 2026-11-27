@@ -194,6 +194,12 @@ use x86_64::X8664arch as Arch;
 use crate::crosvm::config::Config;
 use crate::crosvm::config::Executable;
 use crate::crosvm::config::HypervisorKind;
+#[cfg(all(target_arch = "aarch64", feature = "xen"))]
+use crate::crosvm::sys::linux::config::{
+    XenGuestConfig,
+    XenDeviceConfig,
+    DeviceRegion,
+};
 use crate::crosvm::config::InputDeviceOption;
 use crate::crosvm::config::IrqChipKind;
 use crate::crosvm::config::DEFAULT_TOUCH_DEVICE_HEIGHT;
@@ -1944,26 +1950,21 @@ fn run_kvm(device_path: Option<&Path>, cfg: Config, components: VmComponents) ->
 }
 
 #[cfg(all(target_arch = "aarch64", feature = "xen"))]
-fn run_xen(domid: u16, cfg: Config, components: VmComponents) -> Result<ExitState> {
+fn run_xen(guest_config: XenGuestConfig, cfg: Config) -> Result<ExitState> {
     use devices::XenIrqChip;
     use hypervisor::xen::Xen;
     use hypervisor::xen::XenVm;
     use hypervisor::xen::XenIoreqServer;
 
-    // TODO: Using predefined guest MMIO regions, should be provided from Xen
-    // for the target guest device
-    const TEST_MMIO_BASE: u64 = 0x0a00_0000;
-    const TEST_MMIO_SIZE: u64 = 0x1000;
-
     let xen = Xen::new()
         .context("failed to initialize Xen interface")?;
 
-    let nr_vcpus = xen.nr_vcpus(domid)?;
+    let nr_vcpus = xen.nr_vcpus(guest_config.domid)?;
 
-    let mut ioreq_server = XenIoreqServer::new(&xen, domid)?;
+    let mut ioreq_server = XenIoreqServer::new(&xen, guest_config.domid)?;
 
     // Map the shared IOREQ page.
-    let mapping = xen.map_ioreq_page(domid, &ioreq_server)?;
+    let mapping = xen.map_ioreq_page(guest_config.domid, &ioreq_server)?;
 
     ioreq_server.set_mapping(mapping);
 
@@ -1975,15 +1976,17 @@ fn run_xen(domid: u16, cfg: Config, components: VmComponents) -> Result<ExitStat
 
     info!(
         "IOREQ server initialized for domid {}, vCPUs: {}",
-        domid,
+        guest_config.domid,
         nr_vcpus
     );
 
-    ioreq_server.register_mmio_range(
-        &xen,
-        TEST_MMIO_BASE,
-        TEST_MMIO_SIZE,
-    )?;
+    for device in &guest_config.devices {
+        ioreq_server.register_mmio_range(
+            &xen,
+            device.region.base,
+            device.region.size,
+        )?;
+    }
 
     // TODO: Running internal loop that process guest MMIO accesses
     // Integrate the runtime loop into run_vm()/run_control() if feasible
@@ -2127,7 +2130,6 @@ fn get_default_hypervisor() -> Option<HypervisorKind> {
 }
 
 pub fn run_config(cfg: Config) -> Result<ExitState> {
-    let components = setup_vm_components(&cfg)?;
 
     let hypervisor = cfg
         .hypervisor
@@ -2135,17 +2137,24 @@ pub fn run_config(cfg: Config) -> Result<ExitState> {
         .or_else(get_default_hypervisor)
         .context("no enabled hypervisor")?;
 
+    let components = match &hypervisor {
+        #[cfg(all(target_arch = "aarch64", feature = "xen"))]
+        HypervisorKind::Xen { .. } => None,
+
+        _ => Some(setup_vm_components(&cfg)?),
+    };
+
     debug!("creating hypervisor: {:?}", hypervisor);
 
     match hypervisor {
-        HypervisorKind::Kvm { device } => run_kvm(device.as_deref(), cfg, components),
+        HypervisorKind::Kvm { device } => run_kvm(device.as_deref(), cfg, components.unwrap()),
         #[cfg(all(target_arch = "aarch64", feature = "xen"))]
-        HypervisorKind::Xen { domid } => run_xen(domid, cfg, components),
+        HypervisorKind::Xen { guest_config } => run_xen(guest_config, cfg),
         #[cfg(all(target_arch = "aarch64", feature = "geniezone"))]
-        HypervisorKind::Geniezone { device } => run_gz(device.as_deref(), cfg, components),
+        HypervisorKind::Geniezone { device } => run_gz(device.as_deref(), cfg, components.unwrap()),
         #[cfg(target_arch = "aarch64")]
         #[cfg(feature = "halla")]
-        HypervisorKind::Halla { device } => run_halla(device.as_deref(), cfg, components),
+        HypervisorKind::Halla { device } => run_halla(device.as_deref(), cfg, components.unwrap()),
         #[cfg(all(unix, target_arch = "aarch64", feature = "gunyah"))]
         HypervisorKind::Gunyah {
             device,
@@ -2156,7 +2165,7 @@ pub fn run_config(cfg: Config) -> Result<ExitState> {
             qcom_trusted_vm_id,
             qcom_trusted_vm_pas_id,
             cfg,
-            components,
+            components.unwrap(),
         ),
     }
 }
